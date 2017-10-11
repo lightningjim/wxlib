@@ -13,7 +13,7 @@ s_ms = 3
 # Pressure
 s_mb = 0
 s_hpa = 0
-s_inmg = 2
+s_inmg = 1
 s_mmmg = 2
 
 def temp_conv(temp, from_unit, to_unit):

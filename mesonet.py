@@ -5,30 +5,59 @@ import conversion as conv
 from temp import temp as Temp
 from wind import wind as Wind
 from humidity import humidity as Humidity
+import urllib.request as urllib2
+import csv
+import codecs
 
 class mesonet(object):
 	central = pytz.timezone("US/Central")
 
-	def __init__(self, data):
-		self.station = data[0]
-		self.name = data[1]
-		self.location = (data[3],data[4])
-		self.observed = datetime(int(data[5]),int(data[6]),int(data[7]),int(data[8]),int(data[9]),0,0, self.central)
-		self.air_temp = Temp(float(data[10]), conv.s_fahrenheit)
-		self.humidity = Humidity(Temp(float(data[11]),conv.s_fahrenheit), float(data[12]))
-		if data[13] == '':
-			self.wind_chill = None
-		else:
-			self.wind_chill = Temp(float(data[13]), conv.s_fahrenheit)
-		if data[14] == '':
-			self.heat_index = None
-		else:
-			self.heat_index = Temp(float(data[14]), conv.s_fahrenheit)
-		self.wind = Wind(float(data[15]), data[16], float(data[17]), conv.s_mph, float(data[18]))
-		#self.wind_dir = (int(data[15]),data[16])
-		#self.wind_speed = int(data[17])
-		#self.gust = int(data[18])
-		self.pressure = float(data[19])
+	url = "http://www.mesonet.org/data/basic/mesonet/current/current.csv.v4.txt"
+	default_station = "OKCE"
+
+	def __init__(self, stationID):
+		response = urllib2.urlopen(self.url)
+		wxdata = csv.reader(codecs.iterdecode(response,'utf-8'),delimiter=',')
+		for data in wxdata:
+			if data[0] == stationID:
+				self.station = data[0]
+				self.name = data[1]
+				self.location = (data[3],data[4])
+				self.observed = datetime(int(data[5]),int(data[6]),int(data[7]),int(data[8]),int(data[9]),0,0, self.central)
+				self.air_temp = Temp(float(data[10]), conv.s_fahrenheit)
+				self.humidity = Humidity(Temp(float(data[11]),conv.s_fahrenheit), float(data[12]))
+				if data[13] == '':
+					self.wind_chill = None
+				else:
+					self.wind_chill = Temp(float(data[13]), conv.s_fahrenheit)
+				if data[14] == '':
+					self.heat_index = None
+				else:
+					self.heat_index = Temp(float(data[14]), conv.s_fahrenheit)
+				self.wind = Wind(float(data[15]), data[16], float(data[17]), conv.s_mph, float(data[18]))
+				self.pressure = float(data[19])
+
+	#def __init__(self):
+	#	response = urllib2.urlopen(self.url)
+	#	wxdata = csv.reader(codecs.iterdecode(response,'utf-8'),delimiter=',')
+	#	for data in wxdata:
+	#		if data[0] == self.default_station:
+	#			self.station = data[0]
+	#			self.name = data[1]
+	#			self.location = (data[3],data[4])
+	#			self.observed = datetime(int(data[5]),int(data[6]),int(data[7]),int(data[8]),int(data[9]),0,0, self.central)
+	#			self.air_temp = Temp(float(data[10]), conv.s_fahrenheit)
+	#			self.humidity = Humidity(Temp(float(data[11]),conv.s_fahrenheit), float(data[12]))
+	#			if data[13] == '':
+	#				self.wind_chill = None
+	#			else:
+	#				self.wind_chill = Temp(float(data[13]), conv.s_fahrenheit)
+	#			if data[14] == '':
+	#				self.heat_index = None
+	#			else:
+	#				self.heat_index = Temp(float(data[14]), conv.s_fahrenheit)
+	#			self.wind = Wind(float(data[15]), data[16], float(data[17]), conv.s_mph, float(data[18]))
+	#			self.pressure = float(data[19])
 
 
 	def getID(self):

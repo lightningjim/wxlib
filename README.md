@@ -1,0 +1,2 @@
+# wxlib
+Python Weather Library

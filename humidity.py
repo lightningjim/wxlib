@@ -8,8 +8,12 @@ class humidity(object):
 	def __init__(self, *args):
 		# Absolute and Relative Direct
 		if len(args) == 2:
-			self.absolute = args[0]
-			self.relative = args[1]
+			if isInstance(args[0], temp):
+				self.absolute = args[0]
+				self.relative = args[1]
+			else:
+				self.absolute = gkg_to_dp(args[0])
+				self.relative = args[1]
 		# Only has RH or Absolute
 		elif len(args) == 3:
 			# If only has Relative
@@ -20,6 +24,7 @@ class humidity(object):
 			elif args[2] == s_td_only:
 				self.absolute = args[1]
 				self.relative = rh_from_dp(args[1].toC(), args[2].toC())
+			#
 			elif args[2] == s_gkg:
 				self.absolute = gkg_to_dp(args[1])
 				self.relative = rh_from_dp(self.absolute.toC(),args[2].toC())
@@ -33,5 +38,3 @@ class humidity(object):
 
 	def __str__(self):
 		return "Dewpoint: " + str(self.absolute.toF()) + "F | RH: " + str(self.relative) + "%"
-
-# Also need version for g/kg
